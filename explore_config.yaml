@@ -1,0 +1,11 @@
+# For exploration online update
+# raw_data_file: 'thor_magni_combine_add_time_all_dates_for_train_cliff_correct_ori/B.csv'
+map_file: 'thor_magni_maps/1205_SC1A_map.png'
+
+# resolution
+radius: 1
+step: 1
+
+# dataset_type: 'ART'
+dataset_type: 'OBSERVE'
+# dataset_type: 'MAGNI'
