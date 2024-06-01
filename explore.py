@@ -64,19 +64,22 @@ class ExploreMap:
         plt.xlim([0, 1790])
         plt.ylim([650, 1417])
         
-        # plt.show()
-        plt.savefig('figures/map_check.png', bbox_inches='tight')
+        plt.show()
+        # plt.savefig('figures/map_check.png', bbox_inches='tight')
 
     def get_if_in_free_space(self, position):
         pixel_color = self.img_array[position[1], position[0], :]
         if_free = np.all(pixel_color > 240)
         self.plot_map(robot_position = position)
 
+        
+        
         return if_free
     
     def get_view_point_list():
         ## return a list of view points
         pass
+        # return list_of_view
         
     
 explore = ExploreMap('explore_config.yaml')
@@ -94,5 +97,6 @@ vis_area = {
 
 ## Check if a position is in free space, can uncomment plot line in get_if_in_free_space to visualize the position
 # explored_position = [1500, 1200]
-explored_position = [400, 1050]
-explore.get_if_in_free_space(explored_position)
+explored_position = [1400, 1200]
+res = explore.get_if_in_free_space(explored_position)
+print(res)
