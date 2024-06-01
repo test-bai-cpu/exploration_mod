@@ -15,16 +15,17 @@ import torch
 import pandas as pd
 
 
-
 class PixWorldConverter:
     """Pixel to world converter"""
+
     def __init__(self, info: dict) -> None:
         self.resolution = info["resolution_pm"]  # 1pix -> m
         self.offset = np.array(info["offset"])
+
     def convert2pixels(
         self, world_locations: Union[np.array, torch.Tensor]
     ) -> Union[np.array, torch.Tensor]:
-        
+
         if world_locations.ndim == 2:
             return (world_locations / self.resolution) - self.offset
         new_world_locations = [
@@ -35,11 +36,12 @@ class PixWorldConverter:
             if isinstance(world_locations, torch.Tensor)
             else np.stack(new_world_locations)
         )
+
     def convert2world(
         self, pix_locations: Union[np.array, torch.Tensor]
     ) -> Union[np.array, torch.Tensor]:
         return (pix_locations + self.offset) * self.resolution
-    
+
 
 def read_config_file(config_file) -> dict:
     with open(config_file, 'r') as yaml_file:
