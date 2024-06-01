@@ -69,6 +69,9 @@ def plot_cliff_map_with_weight(cliff_map_data):
             # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=1, cmap="hsv",angles='xy', scale_units='xy', scale=0.7)
         ## For only plot one point:
         # if cliff_map_data[i, 0] == 20 and cliff_map_data[i, 1] == -13:
+        
+        if weight[i] > 1:
+            weight[i] = 1
         plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=1, width=0.004)
         # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=0.7)
 
@@ -82,7 +85,7 @@ def plot_cliff_map_with_weight(cliff_map_data):
 
 if __name__ == "__main__":
     observe_period = 200
-    save_folder = "online_mod_res_new_figs_learning_rate_change"
+    save_folder = "online_mod_res_new_figs_learning_rate_change_v2"
     
     for exp_type in ["A", "B"]:
         for observe_start_time in range(0, 10, 1):
@@ -92,7 +95,7 @@ if __name__ == "__main__":
             for cliff_type in ["all", "online", "interval"]:
                 save_fig_dir = f"{save_folder}/{cliff_type}"
                 os.makedirs(save_fig_dir, exist_ok=True)
-                cliff_file_name = f"online_mod_res_all_dates_learning_rate_change/{exp_type}_{observe_start_time}_{observe_start_time + observe_period}_{cliff_type}.csv"    
+                cliff_file_name = f"online_mod_res_all_dates_learning_rate_change_v2/{exp_type}_{observe_start_time}_{observe_start_time + observe_period}_{cliff_type}.csv"    
                 cliff_map_data = read_cliff_map_data(cliff_file_name)
                 
                 if len(cliff_map_data) == 0:
