@@ -25,3 +25,4 @@ max_iter_em: 1000
 # For update EM
 convergence_thres_update_em: 1e-10
 max_iter_update_em: 1000
+decay_rate: 0.9

@@ -38,6 +38,7 @@ class OnlineUpdateMoD:
         #     shutil.rmtree(output_cliff_folder)
         self.cliff_csv_folder = output_cliff_folder
         self.save_fig_folder = save_fig_folder
+        self.decay_rate = float(self.config_params["decay_rate"])
         os.makedirs(self.cliff_csv_folder, exist_ok=True)
         os.makedirs(self.save_fig_folder, exist_ok=True)
         
@@ -91,7 +92,7 @@ class OnlineUpdateMoD:
                 data.S_cur = S_cur
                 data.T_cur = T_cur
                 
-                data.importance_value = data.importance_value * 0.9 + len(data.new_data)
+                data.importance_value = data.importance_value * self.decay_rate + len(data.new_data)
                 
                 ### to update using all the data before, i.e., build cliff using all new + history data
                 all_cliffs, _, _, _ = self.build_cliff(key, data)
