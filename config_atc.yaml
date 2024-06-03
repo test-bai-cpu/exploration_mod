@@ -2,6 +2,7 @@
 # raw_data_file: 'thor_magni_combine_add_time_all_dates_for_train_cliff_correct_ori/B.csv'
 map_file: 'thor_magni_maps/1205_SC1B_map.png'
 raw_dataset: 'ATC'
+# raw_dataset: 'MAGNI'
 
 # For splitting data into grid
 radius: 1

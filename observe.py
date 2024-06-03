@@ -22,17 +22,26 @@ class InThorMagniDataset():
         self.config_params = utils.read_config_file(config_file)
         self.raw_data_file = raw_data_file
         self.map_file = self.config_params['map_file']
+        self.raw_dataset = self.config_params['raw_dataset']
         self._load_dataset()
     
     def _load_dataset(self):
-        data = pd.read_csv(self.raw_data_file)
-        data = data.rename(columns={
-            'Time': 'time',
-            'ag_id': 'person_id', 
-            'speed': 'velocity', 
-            'theta_delta': 'motion_angle'})
-        data['motion_angle'] = np.mod(data['motion_angle'], 2 * np.pi)
-        self.data = data[['time', 'x', 'y', 'velocity', 'motion_angle']]
+        if self.raw_dataset == 'MAGNI':
+            data = pd.read_csv(self.raw_data_file)
+            data = data.rename(columns={
+                'Time': 'time',
+                'ag_id': 'person_id', 
+                'speed': 'velocity', 
+                'theta_delta': 'motion_angle'})
+            data['motion_angle'] = np.mod(data['motion_angle'], 2 * np.pi)
+            self.data = data[['time', 'x', 'y', 'velocity', 'motion_angle']]
+        
+        elif self.raw_dataset == 'ATC':
+            data = pd.read_csv(self.raw_data_file, header=None)
+            data.columns = ["time", "person_id", "x", "y", "velocity", "motion_angle"]
+            data['motion_angle'] = np.mod(data['motion_angle'], 2 * np.pi)
+            self.data = data[['time', 'x', 'y', 'velocity', 'motion_angle']]
+            
 
     def in_fov(self, x, y, robot_pos, facing_angle, fov_angle, fov_radius):
         rel_pos = np.array([x, y]) - robot_pos
@@ -63,18 +72,32 @@ class InThorMagniDataset():
     def get_observed_traj_region(self, obs_x, obs_y, delta_x, delta_y, observe_start_time, observe_period):
         # Filter data based on observation time window
         time_filtered_df = self.data[(self.data['time'] >= observe_start_time) & (self.data['time'] < observe_start_time + observe_period)].copy()
+        # Filter data within the robot's field of view
+        time_filtered_df.loc[:, 'in_fov'] = time_filtered_df.apply(
+            lambda row: self.in_region(row['x'], row['y'], obs_x, obs_y, delta_x, delta_y), axis=1
+        )
+        
+        df_in_fov = time_filtered_df[time_filtered_df['in_fov']].drop(columns=['in_fov'])
+        
+        return df_in_fov
+
+    def get_observed_traj_region_all_time(self, obs_x, obs_y, delta_x, delta_y):
+        # Filter data based on observation time window
+        time_filtered_df = self.data.copy()
         
         # Filter data within the robot's field of view
         time_filtered_df.loc[:, 'in_fov'] = time_filtered_df.apply(
             lambda row: self.in_region(row['x'], row['y'], obs_x, obs_y, delta_x, delta_y), axis=1
         )
         
-        # print(time_filtered_df)
-        
         df_in_fov = time_filtered_df[time_filtered_df['in_fov']].drop(columns=['in_fov'])
         
         return df_in_fov
-
+    
+    def get_observed_traj_all_area_all_time(self):
+        df_in_fov = self.data.copy()
+        
+        return df_in_fov
 
     def get_observed_traj_all_area(self, obs_x, obs_y, delta_x, delta_y, observe_start_time, observe_period):
         # Filter data based on observation time window
@@ -83,6 +106,56 @@ class InThorMagniDataset():
         df_in_fov = time_filtered_df
         
         return df_in_fov
+
+
+    def plot_region_atc(self, obs_x, obs_y, delta_x, delta_y, observed_traj, fig_name):
+        plt.clf()
+        plt.close('all')
+        
+        plt.figure(figsize=(10, 8), dpi=200)
+        plt.subplot(111)
+        img = plt.imread("localization_grid_white.jpg")
+        plt.imshow(img, cmap='gray', vmin=0, vmax=255, extent=[-60, 80, -40, 20])
+        
+        bottom_left = (obs_x, obs_y)
+        bottom_right = (obs_x + delta_x, obs_y)
+        top_left = (obs_x, obs_y + delta_y)
+        top_right = (obs_x + delta_x, obs_y + delta_y)
+        
+        # Plot the four sides of the rectangle using dashed lines
+        plt.plot([bottom_left[0], bottom_right[0]], [bottom_left[1], bottom_right[1]], 'r--')
+        plt.plot([bottom_right[0], top_right[0]], [bottom_right[1], top_right[1]], 'r--')
+        plt.plot([top_right[0], top_left[0]], [top_right[1], top_left[1]], 'r--')
+        plt.plot([top_left[0], bottom_left[0]], [top_left[1], bottom_left[1]], 'r--')
+    
+
+        (u, v) = utils.pol2cart(observed_traj[['velocity']].values, observed_traj[['motion_angle']].values)
+        color = observed_traj[['motion_angle']].values
+        
+        colors = observed_traj[['motion_angle']].values  * 180 / np.pi
+        colors = np.append(colors, [0, 360])
+        norm = Normalize()
+        norm.autoscale(colors)
+        colormap = cm.hsv
+        
+        plt.quiver(observed_traj['x'], observed_traj['y'], u, v, color=colormap(norm(colors)), alpha=1, cmap="hsv", angles='xy', scale_units='xy', scale=5)
+        sm = cm.ScalarMappable(cmap=colormap, norm=norm)
+
+        cbar = plt.colorbar(sm, shrink = 0.5, ticks=[0, 90, 180, 270, 360], fraction=0.05)
+        cbar.ax.tick_params(labelsize=10)
+        
+        # plt.axis('equal')
+        # plt.axis("off")
+        plt.xlim([28, 33])
+        plt.ylim([-20, -15])
+
+        plt.tight_layout()
+        
+        # plt.text(2060, 830,"Orientation [deg]", rotation='vertical')
+        
+        # plt.show()
+        os.makedirs("figures_ATC", exist_ok=True)
+        plt.savefig(f'figures_ATC/{fig_name}.png')
 
 
     def plot_region(self, obs_x, obs_y, delta_x, delta_y, observed_traj, fig_name):

@@ -66,11 +66,12 @@ class OnlineUpdateMoD:
                 data.T_cur = T_cur
 
                 utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_online.csv", cliffs)
-                utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_all.csv", cliffs)
-                utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_interval.csv", cliffs)
+                # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_all.csv", cliffs)
+                # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_interval.csv", cliffs)
                 
                 data.importance_value = len(data.new_data)
             else:
+                data.importance_value = data.importance_value * self.decay_rate
                 print("key: ", key, " has new data in same grid.")
                 learning_rate = len(data.new_data) / (data.importance_value + len(data.new_data))
                 results = self.update_cliff(key, data, learning_rate, s_type="sEM")
@@ -92,16 +93,16 @@ class OnlineUpdateMoD:
                 data.S_cur = S_cur
                 data.T_cur = T_cur
                 
-                data.importance_value = data.importance_value * self.decay_rate + len(data.new_data)
+                data.importance_value = data.importance_value + len(data.new_data)
                 
-                ### to update using all the data before, i.e., build cliff using all new + history data
-                all_cliffs, _, _, _ = self.build_cliff(key, data)
-                print("all cliffs from start: ")
-                print(all_cliffs)
-                utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_all.csv", all_cliffs)
+                # ### to update using all the data before, i.e., build cliff using all new + history data
+                # all_cliffs, _, _, _ = self.build_cliff(key, data)
+                # print("all cliffs from start: ")
+                # print(all_cliffs)
+                # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_all.csv", all_cliffs)
                 
-                interval_cliffs, _, _, _ = self.build_cliff(key, data, if_build_with_new_data=True)
-                utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_interval.csv", interval_cliffs)
+                # interval_cliffs, _, _, _ = self.build_cliff(key, data, if_build_with_new_data=True)
+                # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_interval.csv", interval_cliffs)
                 
     def combine_cliff(self, key, data, update_cliff):
         before_cliff = data.cliff
@@ -109,9 +110,8 @@ class OnlineUpdateMoD:
         update_p = np.array([row[8] for row in update_cliff])
         
         update_count = len(data.new_data)
-        # total_count = len(data.data)
-        total_count = data.importance_value
-        before_count = total_count - update_count
+        total_count = data.importance_value + update_count
+        before_count = data.importance_value
         
         before_p_new = before_p / (sum(before_p)) * (before_count/total_count)
         for i, row in enumerate(before_cliff):
@@ -232,7 +232,7 @@ class OnlineUpdateMoD:
         ### Update pi
         p = np.ones((cluster_nums)) * (1 / cluster_nums)
         for j in range(cluster_nums):
-            p[j] = N_cur[j,:] / num_observations
+            p[j] = N_cur[j,:]
         p = p / np.sum(p)
         
         ### Update mu
@@ -244,6 +244,8 @@ class OnlineUpdateMoD:
                 m[j,:] = np.divide(S_k, N_k)
             else:
                 m[j,:] = np.zeros_like(m[j,:])
+                
+        m[:,1] = utils.wrap_to_2pi_no_round(m[:,1])
 
         ### Update cov
         c = np.zeros((cluster_nums,2,2), dtype=float)
@@ -302,7 +304,7 @@ class OnlineUpdateMoD:
         N_new = np.zeros((cluster_nums, 1), dtype=float)
         for j in range(cluster_nums):
             sum_r_j = np.sum(r_batch[j,:,:])
-            N_new[j,:] = sum_r_j
+            N_new[j,:] = sum_r_j / num_observations
 
         ### S_k
         S_new = np.zeros((cluster_nums, 2), dtype=float)
@@ -313,7 +315,7 @@ class OnlineUpdateMoD:
                 data_copy = raw_data.copy()
                 data_copy[:, 1] += 2 * np.pi * wrap_num
                 t += data_copy * np.tile(r_batch[j,k,:].reshape(-1,1), (1, 2))
-            S_new[j,:] = np.sum(t, axis=0)
+            S_new[j,:] = np.sum(t, axis=0) / num_observations
         
         ### T_k
         T_new = np.zeros((cluster_nums, 2, 2), dtype=float)
@@ -329,6 +331,6 @@ class OnlineUpdateMoD:
                 t[:,0,1] += d_mod[:,0] * d_mod[:, 1] * r_batch[j,k,:]
                 t[:,1,0] = t[:,0,1]
                 
-            T_new[j,:,:] = np.sum(t, axis=0)
+            T_new[j,:,:] = np.sum(t, axis=0) / num_observations
             
         return N_new, S_new, T_new
