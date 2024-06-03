@@ -66,8 +66,8 @@ class OnlineUpdateMoD:
                 data.T_cur = T_cur
 
                 utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_online.csv", cliffs)
-                utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_all.csv", cliffs)
-                utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_interval.csv", cliffs)
+                # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_all.csv", cliffs)
+                # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_interval.csv", cliffs)
                 
                 data.importance_value = len(data.new_data)
             else:
@@ -95,14 +95,14 @@ class OnlineUpdateMoD:
                 
                 data.importance_value = data.importance_value + len(data.new_data)
                 
-                ### to update using all the data before, i.e., build cliff using all new + history data
-                all_cliffs, _, _, _ = self.build_cliff(key, data)
-                print("all cliffs from start: ")
-                print(all_cliffs)
-                utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_all.csv", all_cliffs)
+                # ### to update using all the data before, i.e., build cliff using all new + history data
+                # all_cliffs, _, _, _ = self.build_cliff(key, data)
+                # print("all cliffs from start: ")
+                # print(all_cliffs)
+                # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_all.csv", all_cliffs)
                 
-                interval_cliffs, _, _, _ = self.build_cliff(key, data, if_build_with_new_data=True)
-                utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_interval.csv", interval_cliffs)
+                # interval_cliffs, _, _, _ = self.build_cliff(key, data, if_build_with_new_data=True)
+                # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_interval.csv", interval_cliffs)
                 
     def combine_cliff(self, key, data, update_cliff):
         before_cliff = data.cliff
@@ -244,6 +244,8 @@ class OnlineUpdateMoD:
                 m[j,:] = np.divide(S_k, N_k)
             else:
                 m[j,:] = np.zeros_like(m[j,:])
+                
+        m[:,1] = utils.wrap_to_2pi_no_round(m[:,1])
 
         ### Update cov
         c = np.zeros((cluster_nums,2,2), dtype=float)
