@@ -36,15 +36,15 @@ def plot_art_exp(cliff_map_file, output_fig_name):
 
     plt.scatter(cliff_map_data[0, 0], cliff_map_data[0, 1], c='black', s=200)
 
-    norm = Normalize(vmin=0, vmax=1)
-    # cmap = cm.Blues
-    colors = [(0, 0, 1, alpha) for alpha in np.linspace(0, 1, 256)]
-    blue_cmap = LinearSegmentedColormap.from_list("BlueAlphaCmap", colors, N=256)
-    sm = plt.cm.ScalarMappable(cmap=blue_cmap, norm=norm)
-    sm.set_array([])
-    cbar = plt.colorbar(sm, ax=plt.gca(), shrink = 0.8, fraction=0.05, pad=0.06)
-    cbar.set_label('Weight', fontsize=20)
-    cbar.ax.tick_params(labelsize=20)
+    # norm = Normalize(vmin=0, vmax=1)
+    # # cmap = cm.Blues
+    # colors = [(0, 0, 1, alpha) for alpha in np.linspace(0, 1, 256)]
+    # blue_cmap = LinearSegmentedColormap.from_list("BlueAlphaCmap", colors, N=256)
+    # sm = plt.cm.ScalarMappable(cmap=blue_cmap, norm=norm)
+    # sm.set_array([])
+    # cbar = plt.colorbar(sm, ax=plt.gca(), shrink = 0.8, fraction=0.05, pad=0.06)
+    # cbar.set_label('Weight', fontsize=20)
+    # cbar.ax.tick_params(labelsize=20)
 
 
     plt.axis('off')
@@ -75,17 +75,19 @@ def plot_art_data(art_map_file, output_fig_name):
     plt.savefig(output_fig_name, bbox_inches='tight')
     # plt.show()
 
-os.makedirs("online_mod_res_art/figs", exist_ok=True)
-# for type in ["all", "interval", "online"]:
-# # for type in ["all"]:
-#     for angle in [0, 90, 180, 270]:
-#         plot_art_exp(f"online_mod_res_art/b1_{angle}_{type}.csv", f"online_mod_res_art/figs/b1_{angle}_{type}.png")
 
-angle = 270
-type = "online"
-plot_art_exp(f"online_mod_res_art/b1_{angle}_{type}.csv", f"online_mod_res_art/figs/legend2.png")
+# # for type in ["all", "interval", "online"]:
+# for type in ["all"]:
+#     save_folder = f"online_mod_res_art_v5/figs/{type}"
+#     os.makedirs(save_folder, exist_ok=True)
+#     for angle in [0, 45, 90, 135, 180, 225, 270, 315]:
+#         plot_art_exp(f"online_mod_res_art_v5/b1_{angle}_{type}.csv", f"{save_folder}/b1_{angle}_{type}.png")
 
+# angle = 270
+# type = "online"
+# plot_art_exp(f"online_mod_res_art/b1_{angle}_{type}.csv", f"online_mod_res_art/figs/legend2.png")
+# os.makedirs("online_mod_res_art/figs_v3", exist_ok=True)
 
-# for angle in [0, 90, 180, 270]:
-#     art_map_file = f'/home/yufei/research/online_mod/online_mod/online_batch_data/artv2/b1_{angle}.csv'
-#     plot_art_data(art_map_file, f"online_mod_res_art/figs/raw_data_{angle}.png")
+# for angle in [0, 45, 90, 135, 180, 225, 270, 315]:
+#     art_map_file = f'/home/yufei/research/online_mod/online_mod/online_batch_data/artv3/b1_{angle}.csv'
+#     plot_art_data(art_map_file, f"online_mod_res_art/figs_v3/raw_data_{angle}.png")

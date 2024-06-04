@@ -39,6 +39,7 @@ class OnlineUpdateMoD:
         self.cliff_csv_folder = output_cliff_folder
         self.save_fig_folder = save_fig_folder
         self.decay_rate = float(self.config_params["decay_rate"])
+        self.combine_thres = float(self.config_params["combine_thres"])
         os.makedirs(self.cliff_csv_folder, exist_ok=True)
         os.makedirs(self.save_fig_folder, exist_ok=True)
         
@@ -245,7 +246,7 @@ class OnlineUpdateMoD:
             else:
                 m[j,:] = np.zeros_like(m[j,:])
                 
-        m[:,1] = utils.wrap_to_2pi_no_round(m[:,1])
+        # m[:,1] = utils.wrap_to_2pi_no_round(m[:,1])
 
         ### Update cov
         c = np.zeros((cluster_nums,2,2), dtype=float)
@@ -294,7 +295,7 @@ class OnlineUpdateMoD:
         r_batch[r_batch < np.finfo(float).eps] = 0
         
         if if_check_sum_r:
-            if np.sum(r_batch) < 1e-1:
+            if np.sum(r_batch) < self.combine_thres:
                 return False
         
         sum_r = np.tile(np.sum(r_batch, axis=(0, 1)), (cluster_nums, len(wind_k), 1))

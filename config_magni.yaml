@@ -1,7 +1,7 @@
 # For exploration online update
 # raw_data_file: 'thor_magni_combine_add_time_all_dates_for_train_cliff_correct_ori/B.csv'
 map_file: 'thor_magni_maps/1205_SC1B_map.png'
-raw_dataset: 'ATC'
+raw_dataset: 'MAGNI'
 
 # For splitting data into grid
 radius: 1
@@ -27,3 +27,4 @@ max_iter_em: 1000
 convergence_thres_update_em: 1e-10
 max_iter_update_em: 1000
 decay_rate: 0.5
+combine_thres: 1e-1

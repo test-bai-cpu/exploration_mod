@@ -337,8 +337,8 @@ def plot_main_process_figure_magni():
 
 
     ##### Plot full cliff map #####
-    model_type = "interval"
-    save_folder = f"online_mod_res_magni/figures/{model_type}"
+    model_type = "online"
+    save_folder = f"online_mod_res_magni_test1/figures/{model_type}"
     os.makedirs(save_folder, exist_ok=True)
     
     for exp_type in ["A", "B"]:
@@ -346,7 +346,7 @@ def plot_main_process_figure_magni():
         for observe_start_time in range(0, 10, 1):
             observe_start_time = observe_start_time * observe_period
             plot_full_cliff(
-                f'online_mod_res_magni/{exp_type}_{observe_start_time}_{observe_start_time + observe_period}_{model_type}.csv', 
+                f'online_mod_res_magni_test1/{exp_type}_{observe_start_time}_{observe_start_time + observe_period}_{model_type}.csv', 
                 f"{save_folder}/cliffmap_{exp_type}_{observe_start_time}_{observe_start_time + observe_period}_{model_type}.png", 
                 map_dir)
 
@@ -395,7 +395,7 @@ def plot_main_process_figure_atc():
             f'online_mod_res_atc/ATC1024_{hour}_{hour+1}_{model_type}.csv', 
             f"{save_folder}/cliffmap_ATC1024_{hour}_{hour+1}_{model_type}.pdf")
 
-# plot_main_process_figure()
+plot_main_process_figure_magni()
 
 
-plot_main_process_figure_atc()
+# plot_main_process_figure_atc()

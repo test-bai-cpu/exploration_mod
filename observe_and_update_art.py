@@ -114,16 +114,15 @@ def test_online_on_atc():
 
 
 def test_online_on_art():
-    
     onlineUpdateMoD = OnlineUpdateMoD(
         config_file="config.yaml",
         current_cliff=None,
-        output_cliff_folder=f"online_mod_res_art",
+        output_cliff_folder=f"online_mod_res_art_v5",
         save_fig_folder=f"save_fig_online")
 
-    for angle in [0, 90, 180, 270]:
+    for angle in [0, 45, 90, 135, 180, 225, 270, 315]:
         print("-------------------- In angle -------------------", angle)
-        thor_magni = InThorMagniDataset('config.yaml', raw_data_file=f'/home/yufei/research/online_mod/online_mod/online_batch_data/artv2/b1_{angle}.csv')
+        thor_magni = InThorMagniDataset('config.yaml', raw_data_file=f'/home/yufei/research/online_mod/online_mod/online_batch_data/artv4/b1_{angle}.csv')
         observed_traj = thor_magni.get_observed_traj_all_area_all_time()
         # thor_magni.plot_region_atc(obs_x, obs_y, delta_x, delta_y, observed_traj, f"{hour}_{hour + 1}")
         onlineUpdateMoD.updateMoD(observed_traj, f"b1_{angle}")
