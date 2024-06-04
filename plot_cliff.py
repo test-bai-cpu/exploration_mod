@@ -36,6 +36,9 @@ def plot_cliff_map_with_weight(cliff_map_data):
     
     location = cliff_map_data[0, :2]
     weight = cliff_map_data[0, 8]
+    orientation = cliff_map_data[:, 3]
+    # orientation = np.mod(orientation, 2 * np.pi)
+    
     max_weight_index = 0
 
     for i in range(1, len(cliff_map_data)):
@@ -53,10 +56,11 @@ def plot_cliff_map_with_weight(cliff_map_data):
 
     max_index_list.append(max_weight_index)
 
-    (u, v) = utils.pol2cart(cliff_map_data[:, 2] * 100, cliff_map_data[:, 3])
+    (u, v) = utils.pol2cart(cliff_map_data[:, 2] * 100, orientation)
     weight = cliff_map_data[:, 8]
 
-    colors = cliff_map_data[:, 3]  * 180 / np.pi
+    cliff_map_data[:, 3] = np.mod(cliff_map_data[:, 3], 2 * np.pi)
+    colors = orientation  * 180 / np.pi
     colors = np.append(colors, [0, 360])
     norm = Normalize()
     norm.autoscale(colors)
@@ -70,18 +74,77 @@ def plot_cliff_map_with_weight(cliff_map_data):
         ## For only plot one point:
         # if cliff_map_data[i, 0] == 20 and cliff_map_data[i, 1] == -13:
         
-        if weight[i] > 1:
-            weight[i] = 1
-        plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=1, width=0.004)
+        plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=2, width=0.008)
+        # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color='b', alpha=weight[i], angles='xy', scale_units='xy', scale=2, width=0.008)
+        # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=1, width=0.02)
         # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=0.7)
 
 
     sm = cm.ScalarMappable(cmap=colormap, norm=norm)
     cbar = plt.colorbar(sm, shrink = 0.5, ticks=[0, 90, 180, 270, 360], fraction=0.05)
     cbar.ax.tick_params(labelsize=10)
-    # plt.text(100, -17,"Orientation [deg]", rotation='vertical')
+    # plt.text(1357, 1020,"Orientation [deg]", rotation='vertical')
+    plt.text(1457, 1020,"Orientation [deg]", rotation='vertical')
     # plt.text(75, -14,"Orientation [deg]", rotation='vertical')
 
+
+def plot_cliff_map_with_weight_ATC(cliff_map_data):
+
+    ## Only leave the SWND with largest weight
+    max_index_list = []
+    
+    location = cliff_map_data[0, :2]
+    weight = cliff_map_data[0, 8]
+    orientation = cliff_map_data[:, 3]
+    # orientation = np.mod(orientation, 2 * np.pi)
+    
+    max_weight_index = 0
+
+    for i in range(1, len(cliff_map_data)):
+        tmp_location = cliff_map_data[i, :2]
+        if (tmp_location == location).all():
+            tmp_weight = cliff_map_data[i, 8]
+            if tmp_weight > weight:
+                max_weight_index = i
+                weight = tmp_weight
+        else:
+            max_index_list.append(max_weight_index)
+            location = cliff_map_data[i, :2]
+            weight = cliff_map_data[i, 8]
+            max_weight_index = i
+
+    max_index_list.append(max_weight_index)
+
+    (u, v) = utils.pol2cart(cliff_map_data[:, 2], orientation)
+    weight = cliff_map_data[:, 8]
+
+    colors = orientation  * 180 / np.pi
+    colors = np.append(colors, [0, 360])
+    norm = Normalize()
+    norm.autoscale(colors)
+    colormap = cm.hsv
+
+    for i in range(len(cliff_map_data)):
+    # for i in range(200):
+        ## For only plot max weight:
+        # if i in max_index_list:
+            # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=1, cmap="hsv",angles='xy', scale_units='xy', scale=0.7)
+        ## For only plot one point:
+        # if cliff_map_data[i, 0] == 20 and cliff_map_data[i, 1] == -13:
+        
+        plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=2, width=0.003)
+        # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color='b', alpha=weight[i], angles='xy', scale_units='xy', scale=2, width=0.008)
+        # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=1, width=0.02)
+        # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=0.7)
+
+
+    sm = cm.ScalarMappable(cmap=colormap, norm=norm)
+    cbar = plt.colorbar(sm, shrink = 0.5, ticks=[0, 90, 180, 270, 360], fraction=0.05)
+    cbar.ax.tick_params(labelsize=10)
+    # plt.text(1357, 1020,"Orientation [deg]", rotation='vertical')
+    # plt.text(1457, 1020,"Orientation [deg]", rotation='vertical')
+    # plt.text(75, -14,"Orientation [deg]", rotation='vertical')
+    
 
 if __name__ == "__main__":
     observe_period = 200
