@@ -53,7 +53,8 @@ class OnlineUpdateMoD:
         
         print("Processing the data..., this batch has ", len(change_grid_centers), " grids.")
 
-        for _, key in enumerate(change_grid_centers):
+        # for _, key in enumerate(change_grid_centers):
+        for _, key in tqdm(enumerate(change_grid_centers), total=len(change_grid_centers), desc='Processing'):
             print("Now processing grid:", key)
             data = self.data_batches.grid_data[key]
 
@@ -66,46 +67,50 @@ class OnlineUpdateMoD:
                 data.S_cur = S_cur
                 data.T_cur = T_cur
 
-                utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_online.csv", cliffs)
-                # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_all.csv", cliffs)
+                # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_online.csv", cliffs)
+                utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_all.csv", cliffs)
                 # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_interval.csv", cliffs)
                 
                 data.importance_value = len(data.new_data)
             else:
-                ################ TO use update online part ################
-                data.importance_value = data.importance_value * self.decay_rate
-                print("key: ", key, " has new data in same grid.")
-                learning_rate = len(data.new_data) / (data.importance_value + len(data.new_data))
-                results = self.update_cliff(key, data, learning_rate, s_type="sEM")
+                # ################ TO use update online part ################
+                # data.importance_value = data.importance_value * self.decay_rate
+                # print("key: ", key, " has new data in same grid.")
+                # learning_rate = len(data.new_data) / (data.importance_value + len(data.new_data))
+                # results = self.update_cliff(key, data, learning_rate, s_type="sEM")
                 
-                if results == None:
-                    cliffs, _, _, _ = self.build_cliff(key, data, if_build_with_new_data=True)
-                    cliffs, N_cur, S_cur, T_cur = self.combine_cliff(key, data, cliffs)
-                    print("new data combine: ")
-                    print(cliffs)
-                    utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_online.csv", cliffs)
-                else:
-                    cliffs, N_cur, S_cur, T_cur = results
-                    print("updated cliffs:")
-                    print(cliffs)
-                    utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_online.csv", cliffs)
+                # if results == None:
+                #     cliffs, _, _, _ = self.build_cliff(key, data, if_build_with_new_data=True)
+                #     cliffs, N_cur, S_cur, T_cur = self.combine_cliff(key, data, cliffs)
+                #     print("new data combine: ")
+                #     print(cliffs)
+                #     utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_online.csv", cliffs)
+                # else:
+                #     cliffs, N_cur, S_cur, T_cur = results
+                #     print("updated cliffs:")
+                #     print(cliffs)
+                #     utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_online.csv", cliffs)
                     
-                data.cliff = cliffs
-                data.N_cur = N_cur
-                data.S_cur = S_cur
-                data.T_cur = T_cur
+                # data.cliff = cliffs
+                # data.N_cur = N_cur
+                # data.S_cur = S_cur
+                # data.T_cur = T_cur
                 
-                data.importance_value = data.importance_value + len(data.new_data)
+                # data.importance_value = data.importance_value + len(data.new_data)
+                # ####################################################################
+                
+                ################ TO use update ALL part ################
+                # ## to update using all the data before, i.e., build cliff using all new + history data
+                all_cliffs, _, _, _ = self.build_cliff(key, data)
+                print("all cliffs from start: ")
+                print(all_cliffs)
+                utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_all.csv", all_cliffs)
                 ####################################################################
                 
-                ### to update using all the data before, i.e., build cliff using all new + history data
-                # all_cliffs, _, _, _ = self.build_cliff(key, data)
-                # print("all cliffs from start: ")
-                # print(all_cliffs)
-                # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_all.csv", all_cliffs)
-                
+                ################ TO use update interval part ################
                 # interval_cliffs, _, _, _ = self.build_cliff(key, data, if_build_with_new_data=True)
                 # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_interval.csv", interval_cliffs)
+                ####################################################################
                 
     def combine_cliff(self, key, data, update_cliff):
         before_cliff = data.cliff

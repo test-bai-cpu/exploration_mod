@@ -23,21 +23,22 @@ def read_cliff_map_data(cliff_map_file):
         print(f"Empty data in {cliff_map_file}")
         return np.array([])
     
-    data.columns = ["x", "y", "motion_angle", "velocity",
+    data.columns = ["x", "y", "velocity", "motion_angle",
                     "cov1", "cov2", "cov3", "cov4", "weight", "motion_ratio"]
     
     return data.to_numpy()
 
 
 def plot_cliff_map_with_weight(cliff_map_data):
-
+    cliff_map_data[:, 3] = np.mod(cliff_map_data[:, 3], 2 * np.pi)
+    
     ## Only leave the SWND with largest weight
     max_index_list = []
     
     location = cliff_map_data[0, :2]
     weight = cliff_map_data[0, 8]
     orientation = cliff_map_data[:, 3]
-    # orientation = np.mod(orientation, 2 * np.pi)
+    orientation = np.mod(orientation, 2 * np.pi)
     
     max_weight_index = 0
 
@@ -59,7 +60,7 @@ def plot_cliff_map_with_weight(cliff_map_data):
     (u, v) = utils.pol2cart(cliff_map_data[:, 2] * 100, orientation)
     weight = cliff_map_data[:, 8]
 
-    cliff_map_data[:, 3] = np.mod(cliff_map_data[:, 3], 2 * np.pi)
+    
     colors = orientation  * 180 / np.pi
     colors = np.append(colors, [0, 360])
     norm = Normalize()
@@ -67,24 +68,24 @@ def plot_cliff_map_with_weight(cliff_map_data):
     colormap = cm.hsv
 
     for i in range(len(cliff_map_data)):
-    # for i in range(200):
-        ## For only plot max weight:
+        # For only plot max weight:
         # if i in max_index_list:
-            # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=1, cmap="hsv",angles='xy', scale_units='xy', scale=0.7)
+            # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=1, cmap="hsv",angles='xy', scale_units='xy', scale=2, width=0.008)
         ## For only plot one point:
         # if cliff_map_data[i, 0] == 20 and cliff_map_data[i, 1] == -13:
         
-        plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=2, width=0.008)
-        # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color='b', alpha=weight[i], angles='xy', scale_units='xy', scale=2, width=0.008)
-        # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=1, width=0.02)
-        # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=0.7)
+        plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=1, width=0.005)
+        # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color='b', alpha=weight[i], angles='xy', scale_units='xy', scale=5, width=0.004)
+        # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color='b', alpha=weight[i], angles='xy', scale_units='xy', scale=4, width=0.01)
+        # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=5, width=0.004)
+        # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=2, width=0.008)
 
 
-    sm = cm.ScalarMappable(cmap=colormap, norm=norm)
-    cbar = plt.colorbar(sm, shrink = 0.5, ticks=[0, 90, 180, 270, 360], fraction=0.05)
-    cbar.ax.tick_params(labelsize=10)
+    # sm = cm.ScalarMappable(cmap=colormap, norm=norm)
+    # cbar = plt.colorbar(sm, shrink = 0.5, ticks=[0, 90, 180, 270, 360], fraction=0.05)
+    # cbar.ax.tick_params(labelsize=10)
     # plt.text(1357, 1020,"Orientation [deg]", rotation='vertical')
-    plt.text(1457, 1020,"Orientation [deg]", rotation='vertical')
+    # plt.text(1457, 1020,"Orientation [deg]", rotation='vertical')
     # plt.text(75, -14,"Orientation [deg]", rotation='vertical')
 
 
@@ -96,7 +97,7 @@ def plot_cliff_map_with_weight_ATC(cliff_map_data):
     location = cliff_map_data[0, :2]
     weight = cliff_map_data[0, 8]
     orientation = cliff_map_data[:, 3]
-    # orientation = np.mod(orientation, 2 * np.pi)
+    orientation = np.mod(orientation, 2 * np.pi)
     
     max_weight_index = 0
 
@@ -127,12 +128,12 @@ def plot_cliff_map_with_weight_ATC(cliff_map_data):
     for i in range(len(cliff_map_data)):
     # for i in range(200):
         ## For only plot max weight:
-        # if i in max_index_list:
-            # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=1, cmap="hsv",angles='xy', scale_units='xy', scale=0.7)
+        if i in max_index_list:
+            plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=1, cmap="hsv",angles='xy', scale_units='xy', scale=1, width=0.003)
         ## For only plot one point:
         # if cliff_map_data[i, 0] == 20 and cliff_map_data[i, 1] == -13:
         
-        plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=2, width=0.003)
+        # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=1, width=0.003)
         # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color='b', alpha=weight[i], angles='xy', scale_units='xy', scale=2, width=0.008)
         # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=1, width=0.02)
         # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=0.7)

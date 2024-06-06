@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 from scipy.stats import multivariate_normal
 
-from process_data import GridData
+from batch_process_data import GridData
 import online_utils as utils
 
 

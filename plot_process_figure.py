@@ -238,24 +238,24 @@ def plot_full_cliff(cliffmap, fig_dir, map_dir):
     cliff_map_data[:, 0:2] = cliff_xy_pixels
     plot_cliff.plot_cliff_map_with_weight(cliff_map_data)
 
-    # print(converter.convert2world(np.array([robot_pos_pix[0]])))
-    # Convert the pixel tick labels to world coordinates (meters)
-    ax = plt.gca()
-    x_ticks_pix = ax.get_xticks()
-    y_ticks_pix = ax.get_yticks()
+    # # print(converter.convert2world(np.array([robot_pos_pix[0]])))
+    # # Convert the pixel tick labels to world coordinates (meters)
+    # ax = plt.gca()
+    # x_ticks_pix = ax.get_xticks()
+    # y_ticks_pix = ax.get_yticks()
     
-    # Convert x ticks
-    x_ticks_pix_pairs = np.column_stack((x_ticks_pix, np.zeros_like(x_ticks_pix)))
-    x_ticks_world = converter.convert2world(x_ticks_pix_pairs)[:, 0]
+    # # Convert x ticks
+    # x_ticks_pix_pairs = np.column_stack((x_ticks_pix, np.zeros_like(x_ticks_pix)))
+    # x_ticks_world = converter.convert2world(x_ticks_pix_pairs)[:, 0]
 
-    # Convert y ticks
-    y_ticks_pix_pairs = np.column_stack((np.zeros_like(y_ticks_pix), y_ticks_pix))
-    y_ticks_world = converter.convert2world(y_ticks_pix_pairs)[:, 1]
+    # # Convert y ticks
+    # y_ticks_pix_pairs = np.column_stack((np.zeros_like(y_ticks_pix), y_ticks_pix))
+    # y_ticks_world = converter.convert2world(y_ticks_pix_pairs)[:, 1]
     
-    ax.xaxis.set_major_locator(FixedLocator(x_ticks_pix))
-    ax.xaxis.set_major_formatter(FixedFormatter([f'{x:.1f}' for x in x_ticks_world]))
-    ax.yaxis.set_major_locator(FixedLocator(y_ticks_pix))
-    ax.yaxis.set_major_formatter(FixedFormatter([f'{y:.1f}' for y in y_ticks_world]))
+    # ax.xaxis.set_major_locator(FixedLocator(x_ticks_pix))
+    # ax.xaxis.set_major_formatter(FixedFormatter([f'{x:.1f}' for x in x_ticks_world]))
+    # ax.yaxis.set_major_locator(FixedLocator(y_ticks_pix))
+    # ax.yaxis.set_major_formatter(FixedFormatter([f'{y:.1f}' for y in y_ticks_world]))
     
     # plt.axis('equal')
     plt.axis("off")
@@ -263,13 +263,20 @@ def plot_full_cliff(cliffmap, fig_dir, map_dir):
     plt.tight_layout()
     # plt.gca().invert_yaxis()
     
-    plt.xlim([0, 1790])
+    ## For check the corridor
+    # plt.xlim([1000, 1500])
+    # plt.ylim([1200, 1400])
+    
+    ## For check the floor marking 1
+    # plt.xlim([100, 700])
+    # plt.ylim([700, 1300])
+    
+    ### For view all
+    plt.xlim([0, 1850])
     plt.ylim([650, 1417])
     
-    # plt.xlim([0, 1850])
-    # plt.ylim([650, 1417])
-    
     # plt.show()
+    # print(fig_dir)
     plt.savefig(fig_dir, bbox_inches='tight')
     
 
@@ -297,7 +304,7 @@ def get_observed_traj(data, robot_position, robot_facing_angle, fov_angle, fov_r
     return df_in_fov
     
 
-def plot_main_process_figure_magni():
+def plot_main_process_figure_magni(magni_folder, model_type):
     # robot_position = np.array([0, 1])  # robot view location, 2d
     robot_position = np.array([1, 2.8])  # robot view location, 2d
     robot_facing_angle = -1  # robot facing direction (radians), 0 means facing right along the x-axis
@@ -337,17 +344,20 @@ def plot_main_process_figure_magni():
 
 
     ##### Plot full cliff map #####
-    model_type = "online"
-    save_folder = f"online_mod_res_magni_test1/figures/{model_type}"
+    # model_type = "interval"
+    # magni_folder = "online_mod_res_magni_A_first_split_random_online"
+    # save_folder = f"{magni_folder}/figures/{model_type}_blue"
+    save_folder = f"{magni_folder}/figures/quality_res_all"
     os.makedirs(save_folder, exist_ok=True)
-    
+        
     for exp_type in ["A", "B"]:
         map_dir = f'thor_magni_maps/1205_SC1{exp_type}_map.png'
+        # map_dir = f'thor_magni_maps/1205_SC1A_map.png'
         for observe_start_time in range(0, 10, 1):
             observe_start_time = observe_start_time * observe_period
             plot_full_cliff(
-                f'online_mod_res_magni_test1/{exp_type}_{observe_start_time}_{observe_start_time + observe_period}_{model_type}.csv', 
-                f"{save_folder}/cliffmap_{exp_type}_{observe_start_time}_{observe_start_time + observe_period}_{model_type}.png", 
+                f'{magni_folder}/{exp_type}_{observe_start_time}_{observe_start_time + observe_period}_{model_type}.csv', 
+                f"{save_folder}/cliffmap_{exp_type}_{observe_start_time}_{observe_start_time + observe_period}_{model_type}.pdf", 
                 map_dir)
 
 
@@ -380,22 +390,21 @@ def plot_full_cliff_atc(cliffmap, fig_dir):
     
 
 def plot_main_process_figure_atc():
-    observe_period = 200  # Observation period
-    
-    observe_start_time = 0
-
     ##### Plot full cliff map #####
-    model_type = "online"
-    save_folder = f"online_mod_res_atc/figures/{model_type}"
+    model_type = "interval"
+    save_folder = f"online_mod_res_atc_split_random_{model_type}/figures/{model_type}/maxweight"
     os.makedirs(save_folder, exist_ok=True)
     
-    for hour in range(9, 21, 1):
-        observe_start_time = observe_start_time * observe_period
+    # for hour in range(9, 21, 1):
+    for hour in range(19, 21, 1):
         plot_full_cliff_atc(
-            f'online_mod_res_atc/ATC1024_{hour}_{hour+1}_{model_type}.csv', 
+            f'online_mod_res_atc_split_random_{model_type}/ATC1024_{hour}_{hour+1}_{model_type}.csv', 
             f"{save_folder}/cliffmap_ATC1024_{hour}_{hour+1}_{model_type}.pdf")
 
-plot_main_process_figure_magni()
+
+# model_type = "all"
+# plot_main_process_figure_magni(f"online_mod_res_magni_A_first_split_random_{model_type}", model_type)
+# plot_main_process_figure_magni(f"online_mod_res_magni_A_first_split_random_{model_type}_updated", model_type)
 
 
-# plot_main_process_figure_atc()
+plot_main_process_figure_atc()
