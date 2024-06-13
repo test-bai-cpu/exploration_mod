@@ -24,5 +24,5 @@ max_iter_em: 100
 
 
 # For update EM
-decay_rate: 0.9
+# decay_rate: 0.9
 combine_thres: 1e-1

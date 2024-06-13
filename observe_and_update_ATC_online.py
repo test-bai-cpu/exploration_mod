@@ -7,12 +7,13 @@ from online_update import OnlineUpdateMoD
 from observe import InThorMagniDataset
 
 
-def test_online_on_atc():
+def test_online_on_atc(decay_rate):
     
     onlineUpdateMoD = OnlineUpdateMoD(
+        decay_rate=decay_rate,
         config_file="config_atc.yaml",
         current_cliff=None,
-        output_cliff_folder=f"online_mod_res_atc_split_random_online",
+        output_cliff_folder=f"online_mod_res_atc_split_random_online_decay_{decay_rate}",
         save_fig_folder=f"save_fig_online")
     
     ## parameters if use a cone view
@@ -43,5 +44,5 @@ def test_online_on_atc():
         # thor_magni.plot_region_atc(obs_x, obs_y, delta_x, delta_y, observed_traj, f"{hour}_{hour + 1}")
         onlineUpdateMoD.updateMoD(observed_traj, f"ATC1024_{hour}_{hour + 1}")
 
-
-test_online_on_atc()
+decay_rate = float(sys.argv[1])
+test_online_on_atc(decay_rate=decay_rate)

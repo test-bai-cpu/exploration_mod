@@ -53,15 +53,15 @@ class OnlineUpdateMoD:
         
         print("Processing the data..., this batch has ", len(change_grid_centers), " grids.")
 
-        for _, key in enumerate(change_grid_centers):
-            print("Now processing grid:", key)
+        for _, key in tqdm(enumerate(change_grid_centers), total=len(change_grid_centers), desc='Processing'):
+            # print("Now processing grid:", key)
             data = self.data_batches.grid_data[key]
 
             if len(data.data) == len(data.new_data):
                 print("key: ", key, " has first appear.")
                 cliffs, N_cur, S_cur, T_cur = self.build_cliff(key, data)
                 data.cliff = cliffs
-                print(cliffs)
+                # print(cliffs)
                 data.N_cur = N_cur
                 data.S_cur = S_cur
                 data.T_cur = T_cur
@@ -73,6 +73,7 @@ class OnlineUpdateMoD:
                 data.importance_value = len(data.new_data)
             else:
                 ################ TO use update online part ################
+                print("--.----: ", self.decay_rate)
                 data.importance_value = data.importance_value * self.decay_rate
                 print("key: ", key, " has new data in same grid.")
                 learning_rate = len(data.new_data) / (data.importance_value + len(data.new_data))
@@ -81,13 +82,13 @@ class OnlineUpdateMoD:
                 if results == None:
                     cliffs, _, _, _ = self.build_cliff(key, data, if_build_with_new_data=True)
                     cliffs, N_cur, S_cur, T_cur = self.combine_cliff(key, data, cliffs)
-                    print("new data combine: ")
-                    print(cliffs)
+                    # print("new data combine: ")
+                    # print(cliffs)
                     utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_online.csv", cliffs)
                 else:
                     cliffs, N_cur, S_cur, T_cur = results
-                    print("updated cliffs:")
-                    print(cliffs)
+                    # print("updated cliffs:")
+                    # print(cliffs)
                     utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_online.csv", cliffs)
                     
                 data.cliff = cliffs
@@ -136,7 +137,6 @@ class OnlineUpdateMoD:
         
 
     def build_cliff(self, key, data: GridData, if_build_with_new_data=False) -> GridData:
-        print("Start building the clusters.")
         mean_shifter = MeanShift(
             grid_data=data, 
             convergence_threshold=float(self.config_params["convergence_thres_ms"]),
@@ -147,8 +147,6 @@ class OnlineUpdateMoD:
             if_build_with_new_data=if_build_with_new_data,
         )
         mean_shifter.run_mean_shift()
-        
-        print("yufei test: ", mean_shifter.cluster_centers)
         
         if len(mean_shifter.cluster_centers) == 0:
             return [], None, None, None

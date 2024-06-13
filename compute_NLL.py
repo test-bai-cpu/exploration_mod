@@ -146,7 +146,7 @@ def compute_nll(test_data_file, MoD_file, dataset_name):
         nlls.append(nll)
         
     average_nll = np.mean(nlls)
-    print(f'Average NLL: {average_nll}')
+    # print(f'Average NLL: {average_nll}')
     
     return nlls
 
@@ -187,6 +187,39 @@ def compute_for_magni(exp_first, model_type):
     
     return average_nll
 
+def compute_for_magni_decay(exp_first, model_type, decay_rate):
+    dataset_name = "MAGNI"
+    exp_types = ['A', 'B']
+
+    nlls = []
+    
+    for exp_type in exp_types:
+        for observe_start_time_ind in range(0, 10, 1):
+            observe_start_time = observe_start_time_ind * 200
+            # print("-------------------- In time period -------------------")
+            # print(exp_type, observe_start_time, observe_start_time + 200)
+            test_data_file = f'thor_magni_combine_add_time_all_dates_for_train_cliff_correct_ori/split_data_random/{exp_type}_test_{observe_start_time}_{observe_start_time + 200}.csv'
+            
+            MoD_file = f"online_mod_res_magni_{exp_first}_first_split_random_{model_type}_decay_{decay_rate}/{exp_type}_{observe_start_time}_{observe_start_time + 200}_{model_type}.csv"
+            
+            each_nlls = compute_nll(test_data_file, MoD_file, dataset_name)
+            if each_nlls is not None:
+                nlls += each_nlls
+                # print(nlls)
+            else:
+                print(f"File {MoD_file} not found")
+            
+            # nll = compute_nll(test_data_file, MoD_file, dataset_name)
+            # if nll is not None:
+            #     nlls.append(nll)
+            # else:
+            #     print(f"File {MoD_file} not found") 
+            # print(nll)
+            
+    average_nll = np.mean(nlls)
+    
+    return average_nll
+
 def compute_for_atc(model_type):
     dataset_name = "ATC"
 
@@ -197,9 +230,43 @@ def compute_for_atc(model_type):
         test_data_file = f'atc-1s-ds-1024-split-hour/split_data_random/atc-1024-{hour}_test.csv'
         
         if model_type in ["all"]:
-            MoD_file = f"/home/yufei/research/for-desktop/cliff/atc/atc-20121024-ds-full-2cliff.csv"
+            MoD_file = f"cliff/atc-1024-cliff.csv"
+            # MoD_file = f"online_mod_res_atc_split_random_{model_type}/ATC1024_{hour}_{hour+1}_{model_type}.csv"
         else:
             MoD_file = f"online_mod_res_atc_split_random_{model_type}/ATC1024_{hour}_{hour+1}_{model_type}.csv"
+        # MoD_file = f"/home/yufei/research/for-desktop/cliff/cliff-map-hours/cliff-map-{hour}.csv"
+        # nll = compute_nll(test_data_file, MoD_file, dataset_name)
+        # if nll is not None:
+        #     nlls.append(nll)
+        # else:
+        #     print(f"File {MoD_file} not found")
+        
+        each_nlls = compute_nll(test_data_file, MoD_file, dataset_name)
+        if each_nlls is not None:
+            nlls += each_nlls
+            # print(nlls)
+        else:
+            print(f"File {MoD_file} not found")
+        
+            
+    average_nll = np.mean(nlls)
+    
+    return average_nll
+
+def compute_for_atc_decay(model_type, decay_rate):
+    dataset_name = "ATC"
+
+    nlls = []
+    
+    for hour in range(9, 21, 1):
+        # print(f"-------------------- In time period {hour} -------------------")
+        test_data_file = f'atc-1s-ds-1024-split-hour/split_data_random/atc-1024-{hour}_test.csv'
+        
+        if model_type in ["all"]:
+            MoD_file = f"cliff/atc-1024-cliff.csv"
+            # MoD_file = f"online_mod_res_atc_split_random_{model_type}/ATC1024_{hour}_{hour+1}_{model_type}.csv"
+        else:
+            MoD_file = f"online_mod_res_atc_split_random_{model_type}_decay_{decay_rate}/ATC1024_{hour}_{hour+1}_{model_type}.csv"
         # MoD_file = f"/home/yufei/research/for-desktop/cliff/cliff-map-hours/cliff-map-{hour}.csv"
         # nll = compute_nll(test_data_file, MoD_file, dataset_name)
         # if nll is not None:
@@ -226,9 +293,9 @@ def compute_for_atc(model_type):
 # atc_nll = compute_for_atc(model_type)
 # print(f'ATC NLL: {atc_nll}') # ATC NLL: 1.6306520245669913
 
-model_type = "interval"
-atc_nll = compute_for_atc(model_type)
-print(f'ATC NLL: {atc_nll}')
+# model_type = "interval"
+# atc_nll = compute_for_atc(model_type)
+# print(f'ATC NLL: {atc_nll}')
 
 # 1.5835608406648927
 
@@ -265,9 +332,28 @@ print(f'ATC NLL: {atc_nll}')
 # ATC NLL: 4.244636609302291
 
 
+for decay_rate in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]:
+# for decay_rate in [0.4]:
+    print(f"Decay rate: {decay_rate}")   
+    model_type = "online"
+    atc_nll = compute_for_atc_decay(model_type, decay_rate)
+    print(f'ATC NLL: {atc_nll}')
+
 
 
 ######################### MAGNI #########################
+
+# for decay_rate in [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]:
+#     print(f"Decay rate: {decay_rate}")
+#     exp_first = 'A'    
+#     model_type = "online"
+#     magni_nll = compute_for_magni_decay(exp_first, model_type, decay_rate)
+#     print(f'MAGNI NLL: {magni_nll}') # MAGNI NLL: 1.9112291522773677
+
+
+# 0.1: 
+
+
 
 # exp_first = 'A'    
 # model_type = "online"

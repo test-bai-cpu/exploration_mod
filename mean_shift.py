@@ -34,8 +34,8 @@ class MeanShift:
         else:
             self.input_data = grid_data.data
         
-        print("---------------------------check ---------------------------------------------------")
-        print("input_data shape: ", self.input_data.shape, grid_data.new_data.shape, grid_data.data.shape)
+        # print("---------------------------check ---------------------------------------------------")
+        # print("input_data shape: ", self.input_data.shape, grid_data.new_data.shape, grid_data.data.shape)
             
         self.convergence_threshold = convergence_threshold
         self.group_distance_tolerance = group_distance_tolerance
