@@ -402,9 +402,13 @@ def plot_main_process_figure_atc():
             f"{save_folder}/cliffmap_ATC1024_{hour}_{hour+1}_{model_type}.pdf")
 
 
-# model_type = "all"
+for decay_rate in [0.1, 0.9]:
+    model_type = "online"
+    # plot_main_process_figure_magni(f"online_mod_res_magni_A_first_split_random_online_decay_{decay_rate}", model_type)
+    plot_main_process_figure_magni(f"online_mod_res_magni_A_first_split_random_online_decay_{decay_rate}", model_type)
+
 # plot_main_process_figure_magni(f"online_mod_res_magni_A_first_split_random_{model_type}", model_type)
 # plot_main_process_figure_magni(f"online_mod_res_magni_A_first_split_random_{model_type}_updated", model_type)
 
 
-plot_main_process_figure_atc()
+# plot_main_process_figure_atc()
