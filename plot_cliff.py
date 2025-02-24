@@ -128,12 +128,12 @@ def plot_cliff_map_with_weight_ATC(cliff_map_data):
     for i in range(len(cliff_map_data)):
     # for i in range(200):
         ## For only plot max weight:
-        if i in max_index_list:
-            plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=1, cmap="hsv",angles='xy', scale_units='xy', scale=1, width=0.003)
+        # if i in max_index_list:
+        #     plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=1, cmap="hsv",angles='xy', scale_units='xy', scale=1, width=0.003)
         ## For only plot one point:
         # if cliff_map_data[i, 0] == 20 and cliff_map_data[i, 1] == -13:
         
-        # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=1, width=0.003)
+        plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=1, width=0.003)
         # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color='b', alpha=weight[i], angles='xy', scale_units='xy', scale=2, width=0.008)
         # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=1, width=0.02)
         # plt.quiver(cliff_map_data[i, 0], cliff_map_data[i, 1], u[i], v[i], color=colormap(norm(colors))[i], alpha=weight[i], cmap="hsv",angles='xy', scale_units='xy', scale=0.7)

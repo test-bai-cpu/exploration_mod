@@ -22,6 +22,7 @@ def convert_to_mins(all_time):
 
 decay_rate = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9]
 nll = [1.86, 1.72, 1.67, 1.65, 1.64, 1.67, 1.70, 1.74, 1.79]
+# nll = [2.182, 1.973, 1.853, 1.786, 1.779, 1.757, 1.747, 1.748, 1.752]
 
 nll_2 = []
 
@@ -58,4 +59,4 @@ plt.yticks()
 plt.yticks(fontsize=20)
 # plt.grid(True)
 # plt.show()
-plt.savefig('decay_magni.pdf')
+plt.savefig('decay_magni2.png')

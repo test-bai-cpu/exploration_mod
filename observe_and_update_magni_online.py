@@ -16,6 +16,7 @@ def test_online_on_thor_magni():
         config_file="config_magni.yaml",
         current_cliff=None,
         output_cliff_folder=f"online_mod_res_magni_A_first_online",
+        # output_cliff_folder=f"magni-res-v2/cliff/online_train",
         save_fig_folder=f"save_fig_online")
     
     ## parameters if use a cone view
@@ -34,15 +35,15 @@ def test_online_on_thor_magni():
     
     
     # #### For rectangular region ####
-    obs_x = 1
-    obs_y = 1
-    delta_x = 6
-    delta_y = 3
+    # obs_x = 1
+    # obs_y = 1
+    # delta_x = 6
+    # delta_y = 3
     
-    # # obs_x = -7
-    # # obs_y = -3.5
-    # # delta_x = 5
-    # # delta_y = 5
+    # # # obs_x = -7
+    # # # obs_y = -3.5
+    # # # delta_x = 5
+    # # # delta_y = 5
     
     for exp_type in ['A', 'B']:
         thor_magni = InThorMagniDataset('config_magni.yaml', raw_data_file=f'thor_magni_combine_add_time_all_dates_for_train_cliff_correct_ori/{exp_type}.csv')
@@ -92,14 +93,14 @@ def test_online_on_thor_magni_split(batch_num):
             onlineUpdateMoD.updateMoD(observed_traj, f"{exp_type}_{observe_start_time}_{observe_start_time + observe_period}")
 
 
-def test_online_on_thor_magni_split_random(exp_first='A', model_type='online', decay_rate=0.9):
+def test_online_on_thor_magni_split_random(exp_first='A', model_type='online', decay_rate=0.5):
     # model_type = 'online'
     
     onlineUpdateMoD = OnlineUpdateMoD(
-        decay_rate=decay_rate,
+        # decay_rate=decay_rate,
         config_file="config_magni.yaml",
         current_cliff=None,
-        output_cliff_folder=f"online_mod_res_magni_{exp_first}_first_split_random_{model_type}_decay_{decay_rate}",
+        output_cliff_folder=f"online_mod_res_magni_{exp_first}_first_split_random_{model_type}_decay_{decay_rate}_v3",
         save_fig_folder=f"save_fig_online")
     
     observe_period = 200  # Observation period
@@ -132,11 +133,46 @@ def test_online_on_thor_magni_split_random(exp_first='A', model_type='online', d
                 log_file.write(f"{end_time - start_time:.2f}\n")
 
 
+def test_online_v2(try_num, decay_rate):
+    onlineUpdateMoD = OnlineUpdateMoD(
+        decay_rate=decay_rate,
+        config_file="config_magni.yaml",
+        current_cliff=None,
+        output_cliff_folder=f"magni-res-v2/cliff/online_res/try{try_num}/decay_{decay_rate}",
+        save_fig_folder=f"save_fig_online")
+
+    exp_types = ['A', 'B']
+        
+    for exp_type in exp_types:
+        for batch_num in range(1, 6, 1):
+            start_time = time.time()
+
+            raw_data_file = f'magni-res-v2/online_train/{exp_type}_b{batch_num}.csv'
+            thor_magni = InThorMagniDataset('config_magni.yaml', raw_data_file=raw_data_file)
+            observed_traj = thor_magni.get_observed_traj_all_area_all_time()
+            onlineUpdateMoD.updateMoD(observed_traj, f"{exp_type}_b{batch_num}")
+
+            end_time = time.time()
+            # print(end_time, end_time - start_time)
+            
+            with open(f"magni-res-v2/cliff/online_res/online_timelog.log", 'a') as log_file:
+                log_file.write(f"{exp_type}_b{batch_num}: {end_time - start_time:.2f}\n")
+
+
+
 ############ To train on split, 10 fold ############
 # batch_num = sys.argv[1]
 # batch_num = 1
 # test_online_on_thor_magni_split(batch_num)
 
-decay_rate = float(sys.argv[1])
+# decay_rate = float(sys.argv[1])
 ############ To train on random sample 10% split, 1 fold ############
-test_online_on_thor_magni_split_random(exp_first='A', model_type='online', decay_rate=decay_rate)
+# test_online_on_thor_magni_split_random(exp_first='A', model_type='online', decay_rate=decay_rate)
+# test_online_on_thor_magni_split_random(exp_first='A', model_type='online')
+
+############# The new version, for A B side by side ############
+
+
+decay_rate = float(sys.argv[1])
+try_num = sys.argv[2]
+test_online_v2(try_num, decay_rate=decay_rate)

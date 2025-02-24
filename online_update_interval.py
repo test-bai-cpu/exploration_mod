@@ -51,17 +51,17 @@ class OnlineUpdateMoD:
     def updateMoD(self, new_batch_file, output_file_name):
         change_grid_centers = self.data_batches.process_new_batch(new_batch_file)
         
-        print("Processing the data..., this batch has ", len(change_grid_centers), " grids.")
+        # print("Processing the data..., this batch has ", len(change_grid_centers), " grids.")
 
         for _, key in enumerate(change_grid_centers):
-            print("Now processing grid:", key)
+            # print("Now processing grid:", key)
             data = self.data_batches.grid_data[key]
 
             if len(data.data) == len(data.new_data):
-                print("key: ", key, " has first appear.")
+                # print("key: ", key, " has first appear.")
                 cliffs, N_cur, S_cur, T_cur = self.build_cliff(key, data)
                 data.cliff = cliffs
-                print(cliffs)
+                # print(cliffs)
                 data.N_cur = N_cur
                 data.S_cur = S_cur
                 data.T_cur = T_cur

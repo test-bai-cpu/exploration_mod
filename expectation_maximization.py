@@ -116,7 +116,12 @@ class ExpectationMaximization:
             p = np.ones((cluster_nums, 1)) * (1 / cluster_nums)
             for j in range(cluster_nums):
                 p[j,0] = np.sum(r[j,:,:]) / len(data)
-            p = p / np.sum(p)
+                
+            # check if sum p not zero
+            if np.sum(p) == 0:
+                p = np.ones((cluster_nums, 1)) * (1 / cluster_nums)
+            else:
+                p = p / np.sum(p)
             
             for j in range(cluster_nums):
                 try:
@@ -136,7 +141,7 @@ class ExpectationMaximization:
             rs = 0
             rn = 0
             for j in range(cluster_nums):
-                if c[j,0,0] < 10**(-8) or c[j,1,1] < 10**(-8):
+                if c[j,0,0] < 10**(-4) or c[j,1,1] < 10**(-4):
                     rem[j] = 1
                     new_cluster_nums -= 1
                     self.Remsmal += 1
@@ -181,6 +186,8 @@ class ExpectationMaximization:
             iter += 1
             # end_time = time.time()
             # print("Iteration: ", iter, "Delta: ", delta)
+        
+        p = p / np.sum(p)
         
         self.mean = m
         self.cov = c

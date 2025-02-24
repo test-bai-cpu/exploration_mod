@@ -14,7 +14,7 @@ def test_online_on_thor_magni():
     onlineUpdateMoD = OnlineUpdateMoD(
         config_file="config_magni.yaml",
         current_cliff=None,
-        output_cliff_folder=f"online_mod_res_magni_A_first_all",
+        output_cliff_folder=f"online_mod_res_magni_A_first_interval",
         save_fig_folder=f"save_fig_online")
     
     ## parameters if use a cone view
@@ -97,7 +97,7 @@ def test_online_on_thor_magni_split_random(exp_first='A', model_type='online'):
     onlineUpdateMoD = OnlineUpdateMoD(
         config_file="config_magni.yaml",
         current_cliff=None,
-        output_cliff_folder=f"online_mod_res_magni_{exp_first}_first_split_random_{model_type}",
+        output_cliff_folder=f"online_mod_res_magni_{exp_first}_first_split_random_{model_type}_interval",
         save_fig_folder=f"save_fig_online")
     
     observe_period = 200  # Observation period
@@ -114,6 +114,7 @@ def test_online_on_thor_magni_split_random(exp_first='A', model_type='online'):
             print("-------------------- In time period -------------------")
             print(exp_type, observe_start_time, observe_start_time + observe_period)
             raw_data_file = f'thor_magni_combine_add_time_all_dates_for_train_cliff_correct_ori/split_data_random/{exp_type}_train_{observe_start_time}_{observe_start_time + observe_period}.csv'
+            # raw_data_file = f'thor_magni_combine_add_time_all_dates_for_train_cliff_correct_ori/window_average/{exp_type}_train_{observe_start_time}_{observe_start_time + observe_period}.csv'
             thor_magni = InThorMagniDataset('config_magni.yaml', raw_data_file=raw_data_file)
             # observed_traj = thor_magni.get_observed_traj_region(obs_x, obs_y, delta_x, delta_y, observe_start_time, observe_period)
             # observed_traj = thor_magni.get_observed_traj_all_area(obs_x, obs_y, delta_x, delta_y, observe_start_time, observe_period)
@@ -129,4 +130,4 @@ def test_online_on_thor_magni_split_random(exp_first='A', model_type='online'):
 
 
 ############ To train on random sample 10% split, 1 fold ############
-test_online_on_thor_magni_split_random(exp_first='B', model_type='interval')
+test_online_on_thor_magni_split_random(exp_first='A', model_type='interval')

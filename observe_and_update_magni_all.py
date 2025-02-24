@@ -130,4 +130,4 @@ def test_online_on_thor_magni_split_random(exp_first='A', model_type='online'):
 
 
 ############ To train on random sample 10% split, 1 fold ############
-test_online_on_thor_magni_split_random(exp_first='B', model_type='all')
+test_online_on_thor_magni_split_random(exp_first='A', model_type='all')

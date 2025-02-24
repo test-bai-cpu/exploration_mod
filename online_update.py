@@ -24,6 +24,7 @@ class OnlineUpdateMoD:
     
     def __init__(
         self,
+        decay_rate: float,
         config_file: str,
         current_cliff: str,
         output_cliff_folder: str,
@@ -38,7 +39,8 @@ class OnlineUpdateMoD:
         #     shutil.rmtree(output_cliff_folder)
         self.cliff_csv_folder = output_cliff_folder
         self.save_fig_folder = save_fig_folder
-        self.decay_rate = float(self.config_params["decay_rate"])
+        # self.decay_rate = float(self.config_params["decay_rate"])
+        self.decay_rate = decay_rate
         self.combine_thres = float(self.config_params["combine_thres"])
         os.makedirs(self.cliff_csv_folder, exist_ok=True)
         os.makedirs(self.save_fig_folder, exist_ok=True)
@@ -49,33 +51,35 @@ class OnlineUpdateMoD:
             dataset_type=self.config_params["dataset_type"])
         
     def updateMoD(self, new_batch_file, output_file_name):
+        print("------decay rate: ", self.decay_rate, "------")
         change_grid_centers = self.data_batches.process_new_batch(new_batch_file)
         
-        print("Processing the data..., this batch has ", len(change_grid_centers), " grids.")
+        # print("Processing the data..., this batch has ", len(change_grid_centers), " grids.")
 
         for _, key in tqdm(enumerate(change_grid_centers), total=len(change_grid_centers), desc='Processing'):
-            # print("Now processing grid:", key)
             data = self.data_batches.grid_data[key]
 
             if len(data.data) == len(data.new_data):
-                print("key: ", key, " has first appear.")
+                data.importance_value = len(data.new_data)
+                # print("key: ", key, " has first appear.")
                 cliffs, N_cur, S_cur, T_cur = self.build_cliff(key, data)
                 data.cliff = cliffs
                 # print(cliffs)
                 data.N_cur = N_cur
                 data.S_cur = S_cur
                 data.T_cur = T_cur
+                # print("new: ", key, data.importance_value)
 
                 utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_online.csv", cliffs)
                 # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_all.csv", cliffs)
                 # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_interval.csv", cliffs)
-                
-                data.importance_value = len(data.new_data)
             else:
                 ################ TO use update online part ################
-                print("--.----: ", self.decay_rate)
+                # print("------------------")
+                # print(self.decay_rate)
+                # print("------------------")
                 data.importance_value = data.importance_value * self.decay_rate
-                print("key: ", key, " has new data in same grid.")
+                # print("key: ", key, " has new data in same grid.")
                 learning_rate = len(data.new_data) / (data.importance_value + len(data.new_data))
                 results = self.update_cliff(key, data, learning_rate, s_type="sEM")
                 
@@ -97,6 +101,7 @@ class OnlineUpdateMoD:
                 data.T_cur = T_cur
                 
                 data.importance_value = data.importance_value + len(data.new_data)
+                # print("add: ", key, data.importance_value)
                 ####################################################################
                 
                 ### to update using all the data before, i.e., build cliff using all new + history data
@@ -107,7 +112,17 @@ class OnlineUpdateMoD:
                 
                 # interval_cliffs, _, _, _ = self.build_cliff(key, data, if_build_with_new_data=True)
                 # utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_interval.csv", interval_cliffs)
-                
+        
+        # Check which grid has no new data
+        unchange_grid_centers = set(self.data_batches.grid_data.keys()) - set(change_grid_centers)
+        for key in unchange_grid_centers:
+            data = self.data_batches.grid_data[key]
+            data.importance_value = data.importance_value * self.decay_rate
+            # print("unchange: ", key, data.importance_value)
+            if data.cliff == []:
+                continue
+            utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_online.csv", data.cliff)
+        
     def combine_cliff(self, key, data, update_cliff):
         before_cliff = data.cliff
         before_p = np.array([row[8] for row in before_cliff])
@@ -177,7 +192,7 @@ class OnlineUpdateMoD:
                 key[0], key[1],
                 emv.mean[cluster_i,0], emv.mean[cluster_i,1],
                 emv.cov[cluster_i,0,0], emv.cov[cluster_i,0,1], emv.cov[cluster_i,1,0], emv.cov[cluster_i,1,1],
-                emv.mix[cluster_i,0], data.motion_ratio
+                emv.mix[cluster_i,0], data.motion_ratio, data.importance_value
             ]
 
             rounded_save_row = [round(value, 5) if not (value is None) else value for value in save_row]
@@ -197,9 +212,9 @@ class OnlineUpdateMoD:
 
 
     def update_cliff(self, key, data: GridData, learning_rate: float, s_type: str = "sEM") -> List:
-        print("Start updating the clusters.")
+        # print("Start updating the clusters.")
         before_cliff = data.cliff
-        print("Before: ", before_cliff)
+        # print("Before: ", before_cliff)
 
         if len(before_cliff) == 0:
             return self.build_cliff(key, data, if_build_with_new_data=True)
@@ -268,7 +283,7 @@ class OnlineUpdateMoD:
                 key[0], key[1],
                 m[cluster_i,0], m[cluster_i,1],
                 c[cluster_i,0,0], c[cluster_i,0,1], c[cluster_i,1,0], c[cluster_i,1,1],
-                p[cluster_i], data.motion_ratio
+                p[cluster_i], data.motion_ratio, data.importance_value
             ]
 
             rounded_save_row = [round(value, 5) if not (value is None) else value for value in save_row]

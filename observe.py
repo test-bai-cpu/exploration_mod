@@ -42,6 +42,18 @@ class InThorMagniDataset():
             data['motion_angle'] = np.mod(data['motion_angle'], 2 * np.pi)
             self.data = data[['time', 'x', 'y', 'velocity', 'motion_angle']]
             
+        elif self.raw_dataset == 'MAGNIv2':
+            data = pd.read_csv(self.raw_data_file, header=None)
+            data.columns = ["time", "person_id", "x", "y", "velocity", "motion_angle"]
+            data['motion_angle'] = np.mod(data['motion_angle'], 2 * np.pi)
+            self.data = data[['time', 'x', 'y', 'velocity', 'motion_angle']]
+            
+        elif self.raw_dataset == "MAPF":
+            data = pd.read_csv(self.raw_data_file, header=None)
+            data.columns = ["time", "person_id", "x", "y", "velocity", "motion_angle"]
+            data['motion_angle'] = np.mod(data['motion_angle'], 2 * np.pi)
+            self.data = data[['time', 'x', 'y', 'velocity', 'motion_angle']]
+            
 
     def in_fov(self, x, y, robot_pos, facing_angle, fov_angle, fov_radius):
         rel_pos = np.array([x, y]) - robot_pos

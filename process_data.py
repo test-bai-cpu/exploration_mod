@@ -127,14 +127,17 @@ class DataProcess:
                 self.grid_data[grid_center] = GridData(grid_center, within_radius)
                 
     def _compute_motion_ratio(self):
-        max_motion = 0
         for grid_data in self.grid_data.values():
-            data_len = len(grid_data.data)
-            if data_len > max_motion:
-                max_motion = data_len
+            grid_data.motion_ratio = len(grid_data.data)
+            
+        # max_motion = 0
+        # for grid_data in self.grid_data.values():
+        #     data_len = len(grid_data.data)
+        #     if data_len > max_motion:
+        #         max_motion = data_len
         
-        for grid_data in self.grid_data.values():
-            grid_data.motion_ratio = len(grid_data.data) / max_motion
+        # for grid_data in self.grid_data.values():
+        #     grid_data.motion_ratio = len(grid_data.data) / max_motion
         
     def get_data_for_grid(self, grid_x, grid_y):
         grid_key = (grid_x, grid_y)

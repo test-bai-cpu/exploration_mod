@@ -5,96 +5,96 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-all_time = [
-    "12:17",
-    "12:20",
-    "12:28",
-    "12:39",
-    "12:53",
-    "13:13",
-    "13:37",
-    "14:06",
-    "14:47",
-    "15:35",
-    "16:25",
-    "17:32",
-    "18:52",
-    "20:20",
-    "21:55",
-    "23:37",
-    "01:32",
-    "03:35",
-    "05:52",
-    "08:26",
-    "11:06",
-]
+# all_time = [
+#     "12:17",
+#     "12:20",
+#     "12:28",
+#     "12:39",
+#     "12:53",
+#     "13:13",
+#     "13:37",
+#     "14:06",
+#     "14:47",
+#     "15:35",
+#     "16:25",
+#     "17:32",
+#     "18:52",
+#     "20:20",
+#     "21:55",
+#     "23:37",
+#     "01:32",
+#     "03:35",
+#     "05:52",
+#     "08:26",
+#     "11:06",
+# ]
 
-interval_time = [
-    "12:17",
-    "12:20",
-    "12:22",
-    "12:24",
-    "12:25",
-    "12:27",
-    "12:28",
-    "12:30",
-    "12:31",
-    "12:33",
-    "12:34",
-    "12:37",
-    "12:39",
-    "12:41",
-    "12:43",
-    "12:45",
-    "12:47",
-    "12:49",
-    "12:50",
-    "12:52",
-    "12:53",    
-]
+# interval_time = [
+#     "12:17",
+#     "12:20",
+#     "12:22",
+#     "12:24",
+#     "12:25",
+#     "12:27",
+#     "12:28",
+#     "12:30",
+#     "12:31",
+#     "12:33",
+#     "12:34",
+#     "12:37",
+#     "12:39",
+#     "12:41",
+#     "12:43",
+#     "12:45",
+#     "12:47",
+#     "12:49",
+#     "12:50",
+#     "12:52",
+#     "12:53",    
+# ]
 
-online_time = [
-    185.60,
-    4.42,
-    7.36,
-    4.37,
-    4.30,
-    3.04,
-    2.88,
-    2.79,
-    2.95,
-    1.90,
-    9.58,
-    3.56,
-    2.79,
-    2.79,
-    2.79,
-    9.86,
-    2.82,
-    2.88,
-    3.08,
-    6.54]
+# online_time = [
+#     185.60,
+#     4.42,
+#     7.36,
+#     4.37,
+#     4.30,
+#     3.04,
+#     2.88,
+#     2.79,
+#     2.95,
+#     1.90,
+#     9.58,
+#     3.56,
+#     2.79,
+#     2.79,
+#     2.79,
+#     9.86,
+#     2.82,
+#     2.88,
+#     3.08,
+#     6.54]
 
-def convert_to_mins(all_time):
-    # Convert time strings to datetime objects, assuming the first time is on day 1
-    time_objects = [datetime.strptime(t, "%H:%M") for t in all_time]
-    for i in range(1, len(time_objects)):
-        # Check if the time rolls over to the next day
-        if time_objects[i] < time_objects[i - 1]:
-            time_objects[i] += timedelta(days=1)  # Increment the day by 1 if there is a rollover
+# def convert_to_mins(all_time):
+#     # Convert time strings to datetime objects, assuming the first time is on day 1
+#     time_objects = [datetime.strptime(t, "%H:%M") for t in all_time]
+#     for i in range(1, len(time_objects)):
+#         # Check if the time rolls over to the next day
+#         if time_objects[i] < time_objects[i - 1]:
+#             time_objects[i] += timedelta(days=1)  # Increment the day by 1 if there is a rollover
 
-    # Calculate intervals in minutes
-    intervals = [(time_objects[i] - time_objects[i - 1]).total_seconds() / 60 for i in range(1, len(time_objects))]
+#     # Calculate intervals in minutes
+#     intervals = [(time_objects[i] - time_objects[i - 1]).total_seconds() / 60 for i in range(1, len(time_objects))]
 
-    return intervals
+#     return intervals
 
-all_time_intervals = convert_to_mins(all_time)
-interval_time_intervals = convert_to_mins(interval_time)
-online_time_intervals = [round(seconds / 60, 3) for seconds in online_time]
+# all_time_intervals = convert_to_mins(all_time)
+# interval_time_intervals = convert_to_mins(interval_time)
+# online_time_intervals = [round(seconds / 60, 3) for seconds in online_time]
 
-print(f"all_time_intervals: {all_time_intervals}")
-print(f"interval_time_intervals: {interval_time_intervals}")
-print(f"online_time_intervals: {online_time_intervals}")
+# print(f"all_time_intervals: {all_time_intervals}")
+# print(f"interval_time_intervals: {interval_time_intervals}")
+# print(f"online_time_intervals: {online_time_intervals}")
 
 
 # plt.figure(figsize=(12, 6))

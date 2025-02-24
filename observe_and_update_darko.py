@@ -3,16 +3,17 @@ import numpy as np
 
 import os, sys
 
-from online_update_interval import OnlineUpdateMoD
+from online_update import OnlineUpdateMoD
 from observe import InThorMagniDataset
 
 
-def test_online_on_atc():
+def test_online_on_darko(decay_rate):
     
     onlineUpdateMoD = OnlineUpdateMoD(
-        config_file="config_atc_b2.yaml",
+        decay_rate=decay_rate,
+        config_file="config_atc.yaml",
         current_cliff=None,
-        output_cliff_folder=f"online_mod_res_atc_split_random_window2_b2",
+        output_cliff_folder=f"online_mod_res_atc_split_random_online_decay_{decay_rate}",
         save_fig_folder=f"save_fig_online")
     
     ## parameters if use a cone view
@@ -37,12 +38,11 @@ def test_online_on_atc():
     delta_y = 3
 
     for hour in range(9, 21, 1):
-        # thor_magni = InThorMagniDataset('config_atc_b2.yaml', raw_data_file=f'atc-1s-ds-1024-split-hour/split_data_random/atc-1024-{hour}_train.csv')
-        thor_magni = InThorMagniDataset('config_atc_b2.yaml', raw_data_file=f'atc-1s-ds-1024-split-hour/combine_for_window_average/atc_window2_{hour}.csv')
+        thor_magni = InThorMagniDataset('config_atc.yaml', raw_data_file=f'atc-1s-ds-1024-split-hour/split_data_random/atc-1024-{hour}_train.csv')
         # observed_traj = thor_magni.get_observed_traj_region_all_time(obs_x, obs_y, delta_x, delta_y)
         observed_traj = thor_magni.get_observed_traj_all_area_all_time()
         # thor_magni.plot_region_atc(obs_x, obs_y, delta_x, delta_y, observed_traj, f"{hour}_{hour + 1}")
         onlineUpdateMoD.updateMoD(observed_traj, f"ATC1024_{hour}_{hour + 1}")
 
-
-test_online_on_atc()
+decay_rate = float(sys.argv[1])
+test_online_on_darko(decay_rate=decay_rate)

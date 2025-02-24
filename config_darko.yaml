@@ -1,18 +1,15 @@
 # For exploration online update
-# raw_data_file: 'thor_magni_combine_add_time_all_dates_for_train_cliff_correct_ori/B.csv'
 map_file: 'thor_magni_maps/1205_SC1B_map.png'
-raw_dataset: 'MAGNIv2'
+raw_dataset: 'DARKO'
 
 # For splitting data into grid
-radius: 0.5
-step: 0.5
-# dataset_type: 'ART'
-dataset_type: 'OBSERVE'
-# dataset_type: 'MAGNI'
+radius: 0.3
+step: 0.3
+dataset_type: 'DARKO-MS2'
 
 # For mean shift
 convergence_thres_ms: 1e-5
-group_distance_tolerance: 1
+group_distance_tolerance: 0.5
 cluster_all: True
 too_few_data_thres: 5
 max_iter_ms: 100
@@ -24,4 +21,5 @@ max_iter_em: 100
 
 
 # For update EM
-combine_thres: 0.1
+decay_rate: 0.9
+combine_thres: 1e-1

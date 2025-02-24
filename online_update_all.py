@@ -51,18 +51,18 @@ class OnlineUpdateMoD:
     def updateMoD(self, new_batch_file, output_file_name):
         change_grid_centers = self.data_batches.process_new_batch(new_batch_file)
         
-        print("Processing the data..., this batch has ", len(change_grid_centers), " grids.")
+        # print("Processing the data..., this batch has ", len(change_grid_centers), " grids.")
 
         # for _, key in enumerate(change_grid_centers):
         for _, key in tqdm(enumerate(change_grid_centers), total=len(change_grid_centers), desc='Processing'):
-            print("Now processing grid:", key)
+            # print("Now processing grid:", key)
             data = self.data_batches.grid_data[key]
 
             if len(data.data) == len(data.new_data):
-                print("key: ", key, " has first appear.")
+                # print("key: ", key, " has first appear.")
                 cliffs, N_cur, S_cur, T_cur = self.build_cliff(key, data)
                 data.cliff = cliffs
-                print(cliffs)
+                # print(cliffs)
                 data.N_cur = N_cur
                 data.S_cur = S_cur
                 data.T_cur = T_cur
@@ -102,8 +102,8 @@ class OnlineUpdateMoD:
                 ################ TO use update ALL part ################
                 # ## to update using all the data before, i.e., build cliff using all new + history data
                 all_cliffs, _, _, _ = self.build_cliff(key, data)
-                print("all cliffs from start: ")
-                print(all_cliffs)
+                # print("all cliffs from start: ")
+                # print(all_cliffs)
                 utils.save_cliff_csv_rows(f"{self.cliff_csv_folder}/{output_file_name}_all.csv", all_cliffs)
                 ####################################################################
                 

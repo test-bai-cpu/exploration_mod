@@ -146,7 +146,7 @@ def find_closest_location(locations, point):
             min_dist = dist
             closest_loc = loc
             
-    if min_dist > 0.5:
+    if min_dist > 10:
         return None
             
     # if closest_loc is None:
@@ -179,46 +179,55 @@ def compute_nll(test_data_file, STeF_file):
     not_find = 0
     
     for _, point in test_data.iterrows():
-        nearest_cell_in_stefmap = find_nearest_cell(point, STeF_data, 0.5)
+        nearest_cell_in_stefmap = find_nearest_cell(point, STeF_data, 1)
         if nearest_cell_in_stefmap is None:
             not_find += 1
-            # nlls.append(-np.log(1e-9))
+            nlls.append(-np.log(1e-9))
             continue
         else:
             nll = get_nll_from_stef(nearest_cell_in_stefmap, point)
             nlls.append(nll)
         
-    # average_nll = np.mean(nlls)
-    return nlls, not_find
-
+    average_nll = np.mean(nlls)
+    
+    return nlls, not_find, average_nll
 
 
 def compute_for_nll_hour():
     nlls = []
+    hour_mean_nlls = []
+    hour_not_find = []
+    hour_std = []
     
     for hour in range(9, 21, 1):
         print(f"-------------------- In time period {hour} -------------------")
         test_data_file = f'atc-1s-ds-1024-split-hour/split_data_random/atc-1024-{hour}_test.csv'
     
         STeF_file = f"stef/atc-stef-maps-full-v2/stef-map-{hour}.csv"
+        # STeF_file = f"stef/atc-stef-maps-full-use-1hz/stef-map-{hour}.csv"
+        # STeF_file = f"stef/atc-stef-maps-full/stef-map-{hour}.csv"
 
-        each_nlls, not_find = compute_nll(test_data_file, STeF_file)
+        each_nlls, not_find, average_nll = compute_nll(test_data_file, STeF_file)
+        
         if each_nlls is not None:
-            # nlls += each_nlls
-            nlls.append((np.mean(each_nlls), not_find))
-            print("For hour", hour, "NLL:", np.mean(each_nlls), not_find)
-        else:
-            print(f"File {STeF_file} not found")
-    
-    return nlls
+            nlls += each_nlls
+            hour_mean_nlls.append(average_nll)
+            hour_not_find.append(not_find)
+            hour_std.append(np.std(each_nlls))
+
+        print(f"Average NLL: {average_nll}, not find: {not_find}", "std: ", np.std(each_nlls))
+        
+    return np.mean(nlls), hour_mean_nlls, hour_not_find, hour_std
 
 
-nll_hour_list = compute_for_nll_hour()
-file_name = f"stef_atc.txt"
+average_nll, hour_mean_nlls, hour_not_find, std_nlls = compute_for_nll_hour()
+file_name = f"stef_atc2.txt"
+# file_name = f"stef/atc-stef-maps-full-v2/stef-map-20.txt"
 
 with open(file_name, "w") as f:
-    for nll in nll_hour_list:
-        f.write(f"{nll}\n")
-    total_avg = np.mean([nll[0] for nll in nll_hour_list])
-    f.write(f"Average NLL: {total_avg}\n")
-    print(f"Average NLL: {total_avg}")
+    for ind in range(len(hour_mean_nlls)):
+        # f.write(f"-------------------- In time period {ind+9} -------------------\n")
+        # f.write(f"hour NLL: {hour_mean_nlls[ind]} , not find: {hour_not_find[ind]}\n")
+        f.write(f"{ind+9},{hour_mean_nlls[ind]},{std_nlls[ind]},{hour_not_find[ind]}\n")
+        
+    f.write(f"AVG total: {average_nll}\n")

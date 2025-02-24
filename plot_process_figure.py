@@ -376,8 +376,18 @@ def plot_full_cliff_atc(cliffmap, fig_dir):
         print(f"Empty data in {cliffmap}")
         return np.array([])
     
-    cliff_map_data.columns = ["x", "y", "motion_angle", "velocity",
-                    "cov1", "cov2", "cov3", "cov4", "weight", "motion_ratio"]
+    # cliff_map_data.columns = ["x", "y", "velocity", "motion_angle",
+    #                 "cov1", "cov2", "cov3", "cov4", "weight", "motion_ratio"]
+    
+    cliff_map_data.columns = ["x", "y", "velocity", "motion_angle",
+                    "cov1", "cov2", "cov3", "cov4", "weight", "motion_ratio", "decay_rate"]
+    
+    # cliff_map_data.columns = ["x", "y", "motion_angle", "velocity",
+    #                 "cov1", "cov2", "cov3", "cov4", "weight",
+    #                 "motion_ratio", "observation_ratio"]
+    ## reorder it:
+    # cliff_map_data = cliff_map_data[["x", "y", "velocity", "motion_angle",
+    #                 "cov4", "cov2", "cov3", "cov1", "weight", "motion_ratio", "observation_ratio"]]
     
     cliff_map_data = cliff_map_data.to_numpy()
     
@@ -391,24 +401,46 @@ def plot_full_cliff_atc(cliffmap, fig_dir):
 
 def plot_main_process_figure_atc():
     ##### Plot full cliff map #####
-    model_type = "interval"
-    save_folder = f"online_mod_res_atc_split_random_{model_type}/figures/{model_type}/maxweight"
+    # model_type = "interval"
+    # cliff_folder = f"online_mod_res_atc_split_random_{model_type}"
+    # save_folder = f"{cliff_folder}/figures/{model_type}"
+    
+    # model_type = "all"
+    # cliff_folder = f"run-along/online_mod_res_atc_split_random_{model_type}_single_file_v2"
+    # save_folder = f"{cliff_folder}/figures/{model_type}"
+    
+    # model_type = "window"
+    # # cliff_folder = f"online_mod_res_atc_split_random_{model_type}"
+    # cliff_folder = "online_mod_res_atc_split_random_window2_b2"
+    # save_folder = f"{cliff_folder}/figures/{model_type}"
+    
+    model_type = "online"
+    cliff_folder = f"coral_atc_try2/0.5"
+    save_folder = f"{cliff_folder}/figures/{model_type}"
+    
     os.makedirs(save_folder, exist_ok=True)
     
-    # for hour in range(9, 21, 1):
-    for hour in range(19, 21, 1):
+    for hour in range(9, 21, 1):
+    # for hour in range(19, 21, 1):
         plot_full_cliff_atc(
-            f'online_mod_res_atc_split_random_{model_type}/ATC1024_{hour}_{hour+1}_{model_type}.csv', 
-            f"{save_folder}/cliffmap_ATC1024_{hour}_{hour+1}_{model_type}.pdf")
+            # f'{cliff_folder}/ATC1024_{hour}_{hour+1}_{model_type}.csv', 
+            f'{cliff_folder}/ATC1024_{hour}_{hour+1}_online_online.csv', 
+            f"{save_folder}/ATC1024_{hour}_{hour+1}_{model_type}.png")
 
 
-for decay_rate in [0.1, 0.9]:
-    model_type = "online"
-    # plot_main_process_figure_magni(f"online_mod_res_magni_A_first_split_random_online_decay_{decay_rate}", model_type)
-    plot_main_process_figure_magni(f"online_mod_res_magni_A_first_split_random_online_decay_{decay_rate}", model_type)
+# for decay_rate in [0.1, 0.9]:
+#     model_type = "online"
+#     # plot_main_process_figure_magni(f"online_mod_res_magni_A_first_split_random_online_decay_{decay_rate}", model_type)
+#     plot_main_process_figure_magni(f"online_mod_res_magni_A_first_split_random_online_decay_{decay_rate}", model_type)
 
 # plot_main_process_figure_magni(f"online_mod_res_magni_A_first_split_random_{model_type}", model_type)
 # plot_main_process_figure_magni(f"online_mod_res_magni_A_first_split_random_{model_type}_updated", model_type)
 
+# plot_main_process_figure_magni(f"online_mod_res_magni_A_first_split_random_interval_window", "interval")
 
-# plot_main_process_figure_atc()
+
+plot_main_process_figure_atc()
+
+# plot_full_cliff_atc(
+#     f'cliff/atc-1024-cliff.csv', 
+#     f"cliff/cliffmap_ATC1024_all.pdf")
